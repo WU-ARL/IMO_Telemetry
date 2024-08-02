@@ -1,0 +1,13 @@
+name: $C_NAME
+type: $C_DISCOVERY # service discovery type to use for resolving cluster (default STATIC)
+lb_policy: $C_LBPOLICY # load balancer type (default ROUND_ROBIN)
+http2_protocol_options: {} 
+load_assignment:
+  cluster_name: $C_NAME # user defined cluster name (automatically assigned when using the generator)
+  endpoints:
+  - lb_endpoints:
+    - endpoint:
+        address:
+          socket_address:
+            address: $C_ADDR # address of next hop (specified when physical topology is chosen)
+            port_value: $C_PORT # port of next hop (specified when physical topology is chosen)

@@ -1,0 +1,553 @@
+{
+    "graph": {
+        "id": "clientProxyNginx",
+        "label": "clientProxyNginx",
+        "type": "topology",
+        "nodes": {
+            "client": {
+                "label": "client",
+                "metadata": {
+                    "type": "sidecar",
+                    "params": {
+                        "NODE_ADMIN_PORT": 9001
+                    }
+                }
+            },
+            "intermediate": {
+                "label": "intermediate",
+                "metadata": {
+                    "type": "sidecar",
+                    "params": {
+                        "NODE_ADMIN_PORT": 9002
+                    }
+                }
+            },
+            "server": {
+                "label": "server",
+                "metadata": {
+                    "type": "sidecar",
+                    "params": {
+                        "NODE_ADMIN_PORT": 9003
+                    }
+                }
+            },
+            "nginx": {
+                "label": "nginx",
+                "metadata": {
+                    "type": "app",
+                    "params": {
+                        "NODE_ADMIN_PORT": 9004
+                    }
+                }
+            },
+            "ubuntu": {
+                "label": "ubuntu",
+                "metadata": {
+                    "type": "app",
+                    "params": {
+                        "NODE_ADMIN_PORT": 9005
+                    }
+                }
+            }
+        },
+        "edges": [
+            {
+                "source": "client",
+                "target": "intermediate",
+                "relation": "http2_tls",
+                "label": "http2_tls",
+                "metadata": {
+                    "if1": 18443,
+                    "if2": 18443
+                }
+            },
+            {
+                "source": "client",
+                "target": "intermediate",
+                "relation": "http2_tls",
+                "label": "http2_tls",
+                "metadata": {
+                    "if1": 18443,
+                    "if2": 18443
+                }
+            },
+            {
+                "source": "client",
+                "target": "intermediate",
+                "relation": "http2_tls",
+                "label": "http2_tls",
+                "metadata": {
+                    "if1": 18443,
+                    "if2": 18443
+                }
+            },
+            {
+                "source": "client",
+                "target": "intermediate",
+                "relation": "http2_tls",
+                "label": "http2_tls",
+                "metadata": {
+                    "if1": 18443,
+                    "if2": 18443
+                }
+            },
+            {
+                "source": "intermediate",
+                "target": "server",
+                "relation": "http2_tls",
+                "label": "http2_tls",
+                "metadata": {
+                    "if1": 18443,
+                    "if2": 18443
+                }
+            },
+            {
+                "source": "intermediate",
+                "target": "server",
+                "relation": "http2_tls",
+                "label": "http2_tls",
+                "metadata": {
+                    "if1": 18443,
+                    "if2": 18443
+                }
+            },
+            {
+                "source": "intermediate",
+                "target": "server",
+                "relation": "http2_tls",
+                "label": "http2_tls",
+                "metadata": {
+                    "if1": 18443,
+                    "if2": 18443
+                }
+            },
+            {
+                "source": "intermediate",
+                "target": "server",
+                "relation": "http2_tls",
+                "label": "http2_tls",
+                "metadata": {
+                    "if1": 18443,
+                    "if2": 18443
+                }
+            },
+            {
+                "source": "server",
+                "target": "nginx",
+                "relation": "http2_tls",
+                "label": "http2_tls",
+                "metadata": {
+                    "if1": 18443,
+                    "if2": 443
+                }
+            },
+            {
+                "source": "server",
+                "target": "nginx",
+                "relation": "http2_tls",
+                "label": "http2_tls",
+                "metadata": {
+                    "if1": 18443,
+                    "if2": 443
+                }
+            },
+            {
+                "source": "server",
+                "target": "nginx",
+                "relation": "http2_tls",
+                "label": "http2_tls",
+                "metadata": {
+                    "if1": 18443,
+                    "if2": 443
+                }
+            },
+            {
+                "source": "server",
+                "target": "nginx",
+                "relation": "http2_tls",
+                "label": "http2_tls",
+                "metadata": {
+                    "if1": 18443,
+                    "if2": 443
+                }
+            },
+            {
+                "source": "client",
+                "target": "intermediate",
+                "relation": "http",
+                "label": "http",
+                "metadata": {
+                    "if1": 18080,
+                    "if2": 18080
+                }
+            },
+            {
+                "source": "client",
+                "target": "intermediate",
+                "relation": "http",
+                "label": "http",
+                "metadata": {
+                    "if1": 18080,
+                    "if2": 18080
+                }
+            },
+            {
+                "source": "client",
+                "target": "intermediate",
+                "relation": "http",
+                "label": "http",
+                "metadata": {
+                    "if1": 18080,
+                    "if2": 18080
+                }
+            },
+            {
+                "source": "client",
+                "target": "intermediate",
+                "relation": "http",
+                "label": "http",
+                "metadata": {
+                    "if1": 18080,
+                    "if2": 18080
+                }
+            },
+            {
+                "source": "intermediate",
+                "target": "server",
+                "relation": "http",
+                "label": "http",
+                "metadata": {
+                    "if1": 18080,
+                    "if2": 18080
+                }
+            },
+            {
+                "source": "intermediate",
+                "target": "server",
+                "relation": "http",
+                "label": "http",
+                "metadata": {
+                    "if1": 18080,
+                    "if2": 18080
+                }
+            },
+            {
+                "source": "intermediate",
+                "target": "server",
+                "relation": "http",
+                "label": "http",
+                "metadata": {
+                    "if1": 18080,
+                    "if2": 18080
+                }
+            },
+            {
+                "source": "intermediate",
+                "target": "server",
+                "relation": "http",
+                "label": "http",
+                "metadata": {
+                    "if1": 18080,
+                    "if2": 18080
+                }
+            },
+            {
+                "source": "server",
+                "target": "nginx",
+                "relation": "http",
+                "label": "http",
+                "metadata": {
+                    "if1": 18080,
+                    "if2": 8880
+                }
+            },
+            {
+                "source": "server",
+                "target": "nginx",
+                "relation": "http",
+                "label": "http",
+                "metadata": {
+                    "if1": 18080,
+                    "if2": 8880
+                }
+            },
+            {
+                "source": "server",
+                "target": "nginx",
+                "relation": "http",
+                "label": "http",
+                "metadata": {
+                    "if1": 18080,
+                    "if2": 8880
+                }
+            },
+            {
+                "source": "server",
+                "target": "nginx",
+                "relation": "http",
+                "label": "http",
+                "metadata": {
+                    "if1": 18080,
+                    "if2": 8880
+                }
+            },
+            {
+                "source": "client",
+                "target": "intermediate",
+                "relation": "tcp",
+                "label": "tcp",
+                "metadata": {
+                    "if1": 18001,
+                    "if2": 18001
+                }
+            },
+            {
+                "source": "client",
+                "target": "intermediate",
+                "relation": "tcp",
+                "label": "tcp",
+                "metadata": {
+                    "if1": 18001,
+                    "if2": 18001
+                }
+            },
+            {
+                "source": "client",
+                "target": "intermediate",
+                "relation": "tcp",
+                "label": "tcp",
+                "metadata": {
+                    "if1": 18001,
+                    "if2": 18001
+                }
+            },
+            {
+                "source": "client",
+                "target": "intermediate",
+                "relation": "tcp",
+                "label": "tcp",
+                "metadata": {
+                    "if1": 18001,
+                    "if2": 18001
+                }
+            },
+            {
+                "source": "intermediate",
+                "target": "server",
+                "relation": "tcp",
+                "label": "tcp",
+                "metadata": {
+                    "if1": 18001,
+                    "if2": 18001
+                }
+            },
+            {
+                "source": "intermediate",
+                "target": "server",
+                "relation": "tcp",
+                "label": "tcp",
+                "metadata": {
+                    "if1": 18001,
+                    "if2": 18001
+                }
+            },
+            {
+                "source": "intermediate",
+                "target": "server",
+                "relation": "tcp",
+                "label": "tcp",
+                "metadata": {
+                    "if1": 18001,
+                    "if2": 18001
+                }
+            },
+            {
+                "source": "intermediate",
+                "target": "server",
+                "relation": "tcp",
+                "label": "tcp",
+                "metadata": {
+                    "if1": 18001,
+                    "if2": 18001
+                }
+            },
+            {
+                "source": "server",
+                "target": "ubuntu",
+                "relation": "tcp",
+                "label": "tcp",
+                "metadata": {
+                    "if1": 18001,
+                    "if2": 6500
+                }
+            },
+            {
+                "source": "server",
+                "target": "ubuntu",
+                "relation": "tcp",
+                "label": "tcp",
+                "metadata": {
+                    "if1": 18001,
+                    "if2": 6500
+                }
+            },
+            {
+                "source": "server",
+                "target": "ubuntu",
+                "relation": "tcp",
+                "label": "tcp",
+                "metadata": {
+                    "if1": 18001,
+                    "if2": 6500
+                }
+            },
+            {
+                "source": "server",
+                "target": "ubuntu",
+                "relation": "tcp",
+                "label": "tcp",
+                "metadata": {
+                    "if1": 18001,
+                    "if2": 6500
+                }
+            },
+            {
+                "source": "client",
+                "target": "intermediate",
+                "relation": "udp",
+                "label": "udp",
+                "metadata": {
+                    "if1": 18002,
+                    "if2": 18002
+                }
+            },
+            {
+                "source": "client",
+                "target": "intermediate",
+                "relation": "udp",
+                "label": "udp",
+                "metadata": {
+                    "if1": 18002,
+                    "if2": 18002
+                }
+            },
+            {
+                "source": "client",
+                "target": "intermediate",
+                "relation": "udp",
+                "label": "udp",
+                "metadata": {
+                    "if1": 18002,
+                    "if2": 18002
+                }
+            },
+            {
+                "source": "client",
+                "target": "intermediate",
+                "relation": "udp",
+                "label": "udp",
+                "metadata": {
+                    "if1": 18002,
+                    "if2": 18002
+                }
+            },
+            {
+                "source": "intermediate",
+                "target": "server",
+                "relation": "udp",
+                "label": "udp",
+                "metadata": {
+                    "if1": 18002,
+                    "if2": 18002
+                }
+            },
+            {
+                "source": "intermediate",
+                "target": "server",
+                "relation": "udp",
+                "label": "udp",
+                "metadata": {
+                    "if1": 18002,
+                    "if2": 18002
+                }
+            },
+            {
+                "source": "intermediate",
+                "target": "server",
+                "relation": "udp",
+                "label": "udp",
+                "metadata": {
+                    "if1": 18002,
+                    "if2": 18002
+                }
+            },
+            {
+                "source": "intermediate",
+                "target": "server",
+                "relation": "udp",
+                "label": "udp",
+                "metadata": {
+                    "if1": 18002,
+                    "if2": 18002
+                }
+            },
+            {
+                "source": "server",
+                "target": "ubuntu",
+                "relation": "udp",
+                "label": "udp",
+                "metadata": {
+                    "if1": 18002,
+                    "if2": 6600
+                }
+            },
+            {
+                "source": "server",
+                "target": "ubuntu",
+                "relation": "udp",
+                "label": "udp",
+                "metadata": {
+                    "if1": 18002,
+                    "if2": 6600
+                }
+            },
+            {
+                "source": "server",
+                "target": "ubuntu",
+                "relation": "udp",
+                "label": "udp",
+                "metadata": {
+                    "if1": 18002,
+                    "if2": 6600
+                }
+            },
+            {
+                "source": "server",
+                "target": "ubuntu",
+                "relation": "udp",
+                "label": "udp",
+                "metadata": {
+                    "if1": 18002,
+                    "if2": 6600
+                }
+            }
+        ],
+        "metadata": {
+            "params": {
+                "DB_BASE": "template_files/base_file/envoy_db.template.yaml",
+                "DYNAMIC_BASE": "template_files/base_file/envoy_dynamic.template.yaml",
+                "STATIC_BASE": "template_files/base_file/envoy_static.template.yaml",
+                "LISTENER_TEMPLATE": "template_files/listeners",
+                "CLUSTER_TEMPLATE": "template_files/clusters",
+                "C_DISCOVERY": "LOGICAL_DNS",
+                "C_LBPOLICY": "ROUND_ROBIN",
+                "TLS_MIN_VERSION": "TLSv1_3",
+                "TLS_MAX_VERSION": "TLSv1_3",
+                "L_CERT": "/etc/envoy/cert.pem",
+                "L_KEY": "/etc/envoy/key.pem",
+                "L_PROTOCOL": "TCP",
+                "CONTROLLER_PORT": "18000"
+            }
+        }
+    }
+}

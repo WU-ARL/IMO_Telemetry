@@ -1,0 +1,69 @@
+{
+    "graph": {
+        "id": "clientProxyNginx",
+        "label": "clientProxyNginx",
+        "type": "topology",
+        "nodes": {
+            "client": {
+                "label": "client",
+                "metadata": {
+                    "type": "sidecar",
+                    "params": {},
+                    "addr": "client"
+                }
+            },
+            "intermediate": {
+                "label": "intermediate",
+                "metadata": {
+                    "type": "sidecar",
+                    "params": {},
+                    "addr": "intermediate"
+                }
+            },
+            "server": {
+                "label": "server",
+                "metadata": {
+                    "type": "sidecar",
+                    "params": {},
+                    "addr": "server"
+                }
+            },
+            "nginx": {
+                "label": "nginx",
+                "metadata": {
+                    "type": "app",
+                    "params": {},
+                    "addr": "nginx"
+                }
+            },
+            "ubuntu": {
+                "label": "ubuntu",
+                "metadata": {
+                    "type": "app",
+                    "params": {},
+                    "addr": "ubuntu-2"
+                }
+            }
+        },
+        "edges": [],
+        "metadata": {
+            "params": {
+                "DB_BASE": "template_files/base_file/envoy_db.template.yaml",
+                "DYNAMIC_BASE": "template_files/base_file/envoy_dynamic.template.yaml",
+                "STATIC_BASE": "template_files/base_file/envoy_static.template.yaml",
+                "LISTENER_TEMPLATE": "template_files/listeners",
+                "CLUSTER_TEMPLATE": "template_files/clusters",
+                "C_DISCOVERY": "LOGICAL_DNS",
+                "C_LBPOLICY": "ROUND_ROBIN",
+                "TLS_MIN_VERSION": "TLSv1_3",
+                "TLS_MAX_VERSION": "TLSv1_3",
+                "L_CERT": "/etc/envoy/cert.pem",
+                "L_KEY": "/etc/envoy/key.pem",
+                "CONTROLLER_ADDR": "envoy-controller",
+                "CONTROLLER_PORT": "18000",
+                "JAEGER_ADDR": "jaeger",
+                "OTEL_ADDR": "otelcol"
+            }
+        }
+    }
+}

@@ -1,0 +1,13 @@
+name: $C_NAME
+type: $C_DISCOVERY
+lb_policy: $C_LBPOLICY
+http2_protocol_options: {}
+load_assignment:
+  cluster_name: $C_NAME
+  endpoints:
+  - lb_endpoints:
+    - endpoint:
+        address:
+          socket_address:
+            address: $C_ADDR
+            port_value: $C_PORT

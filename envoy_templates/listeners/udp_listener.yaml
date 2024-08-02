@@ -1,0 +1,19 @@
+name: $L_NAME
+address:
+  socket_address:
+    protocol: UDP
+    address: 0.0.0.0 #$L_ADDR
+    port_value: $L_PORT
+listener_filters:
+- name: envoy.filters.network.udp_proxy
+  typed_config:
+    "@type": type.googleapis.com/envoy.extensions.filters.udp.udp_proxy.v3.UdpProxyConfig
+    #codec_type: AUTO
+    stat_prefix: $L_STAT
+    matcher:
+      on_no_match:
+        action:
+          name: route
+          typed_config:
+            "@type": type.googleapis.com/envoy.extensions.filters.udp.udp_proxy.v3.Route
+            cluster: $L_NHCLUSTER

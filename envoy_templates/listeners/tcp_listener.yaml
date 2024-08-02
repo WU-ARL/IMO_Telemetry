@@ -1,0 +1,23 @@
+name: $L_NAME
+address:
+  socket_address:
+    protocol: TCP
+    address: 0.0.0.0 #$L_ADDR
+    port_value: $L_PORT
+filter_chains:
+- filters:
+  - name: envoy.filters.network.tcp_proxy
+    typed_config:
+      "@type": type.googleapis.com/envoy.extensions.filters.network.tcp_proxy.v3.TcpProxy
+      #codec_type: AUTO
+      stat_prefix: $L_STAT
+      cluster: $L_NHCLUSTER
+  transport_socket:
+    name: envoy.transport_sockets.tcp_stats.v3.Config
+    typed_config:
+      "@type": "type.googleapis.com/envoy.extensions.transport_sockets.tcp_stats.v3.Config"
+      transport_socket:
+        name: envoy.transport_sockets.raw_buffer
+        typed_config:
+          "@type": type.googleapis.com/envoy.extensions.transport_sockets.raw_buffer.v3.RawBuffer
+      update_period: 1s

@@ -1,0 +1,17 @@
+name: jaeger_stats
+connect_timeout: 5s
+type: $C_DISCOVERY
+typed_extension_protocol_options:
+  envoy.extensions.upstreams.http.v3.HttpProtocolOptions:
+    "@type": type.googleapis.com/envoy.extensions.upstreams.http.v3.HttpProtocolOptions
+    explicit_http_config:
+      http2_protocol_options: {}
+load_assignment:
+  cluster_name: jaeger_stats
+  endpoints:
+  - lb_endpoints:
+    - endpoint:
+        address:
+          socket_address:
+            address: $TRACE_ADDR
+            port_value: 4317

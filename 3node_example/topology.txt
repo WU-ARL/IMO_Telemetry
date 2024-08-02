@@ -1,0 +1,13 @@
+NAME clientProxyNginx
+NODE client sidecar
+NODE intermediate sidecar
+NODE server sidecar
+NODE nginx app
+
+LINK type:http2_tls node1:client:18443 node2:intermediate:18443
+LINK type:http2_tls node1:intermediate:18443 node2:server:18443
+LINK type:http2_tls node1:server:18443 node2:nginx:443
+
+LINK type:http node1:client:18080 node2:intermediate:18080
+LINK type:http node1:intermediate:18080 node2:server:18080
+LINK type:http node1:server:18080 node2:nginx:8880

@@ -1,0 +1,60 @@
+receivers:
+  otlp:
+    protocols:
+      grpc:
+        endpoint: 0.0.0.0:4319 # this causes otel collector to listen on port 4319 we do this because jaeger uses the default 4317
+  #statsd: #this gets added if using the custom run otel collector that includes the statsd receiver which is used for envoy-mobile
+#    endpoint: 0.0.0.0:8125
+#    aggregation_interval: 1s
+#    enable_metric_type: true
+#    is_monotonic_counter: true #false
+#    timer_histogram_mapping:
+#      - statsd_type: "histogram"
+#        observer_type: "gauge"
+#      - statsd_type: "timing"
+#        observer_type: "gauge"
+
+exporters:
+  debug:
+  logging:
+    loglevel: debug
+
+  otlp/jaeger:
+    endpoint: 0.0.0.0:4317
+    tls:
+      insecure: true
+
+ # Data sources: metrics
+  prometheus:
+    endpoint: 0.0.0.0:8889
+    namespace: "imo" #this is what gives the metrics prefix "imo" to collected stats
+    send_timestamps: true
+    metric_expiration: 180m
+    enable_open_metrics: true
+    resource_to_telemetry_conversion:
+      enabled: true
+
+processors:
+  batch:
+
+extensions:
+  health_check:
+  pprof:
+    endpoint: :1888
+  zpages:
+    endpoint: :55679
+
+service:
+  extensions: [pprof, zpages, health_check]
+  pipelines:
+    traces: #will forward any traces pointed at the otel collector to jaeger
+      receivers: [otlp]
+      processors: [batch]
+      exporters: [otlp/jaeger]
+      #exporters: [logging, otlp/jaeger]
+    metrics:
+      #receivers: [otlp, statsd] #uncomment for using the statsd receiver and custom otel
+      receivers: [otlp]
+      processors: [batch]
+      exporters: [prometheus]
+      #exporters: [logging, prometheus] #adding a logging exporter outputs to stdin, good for debugging only

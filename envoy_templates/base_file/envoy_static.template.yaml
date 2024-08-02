@@ -1,0 +1,64 @@
+node:
+  cluster: $NODE_CLUSTER
+  id: $NODE_ID
+
+admin: #defines the port to view admin stats for the proxy
+  address:
+    socket_address:
+      address: 0.0.0.0
+      port_value: $NODE_ADMIN_PORT 
+
+stats_flush_interval: 0.5s #flushes stats every 1/2 sec so visualizations have finer granularity
+
+stats_config: #defines the envoy tag for this proxy, metrics sent can be identified by this in the dashboard 
+  stats_tags:
+  - tag_name: envoy
+    fixed_value: $NODE_ID
+
+stats_sinks: #sends metrics to the otel collector
+- name: envoy.stat_sinks.open_telemetry
+  typed_config:
+    "@type": type.googleapis.com/envoy.extensions.stat_sinks.open_telemetry.v3.SinkConfig
+    grpc_service:
+      envoy_grpc:
+        cluster_name: otlp_stats
+      timeout: 1s
+    emit_tags_as_attributes: true
+
+static_resources:
+  clusters:                                
+  - name: jaeger_stats #cluster pointing to jaeger process for tracing data
+    connect_timeout: 5s
+    type: STRICT_DNS
+    typed_extension_protocol_options:
+      envoy.extensions.upstreams.http.v3.HttpProtocolOptions:
+        "@type": type.googleapis.com/envoy.extensions.upstreams.http.v3.HttpProtocolOptions
+        explicit_http_config:
+          http2_protocol_options: {}
+    load_assignment:
+      cluster_name: jaeger_stats
+      endpoints:
+      - lb_endpoints:
+        - endpoint:
+            address:
+              socket_address:
+                address: $JAEGER_ADDR #ip addr for where Jaeger is running
+                port_value: 4317
+  - name: otlp_stats #cluster pointing to Otel Collector
+    connect_timeout: 5s
+    type: LOGICAL_DNS
+    typed_extension_protocol_options:
+      envoy.extensions.upstreams.http.v3.HttpProtocolOptions:
+        "@type": type.googleapis.com/envoy.extensions.upstreams.http.v3.HttpProtocolOptions
+        explicit_http_config:
+          http2_protocol_options: {}
+    load_assignment:
+      cluster_name: otlp_stats
+      endpoints:
+      - lb_endpoints:
+        - endpoint:
+            address:
+              socket_address:
+                address: $OTEL_ADDR #ip addr for where Otel Collector is running, this differs when using controller
+                port_value: 4319
+

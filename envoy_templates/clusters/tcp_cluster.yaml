@@ -1,0 +1,22 @@
+name: $C_NAME
+type: $C_DISCOVERY
+lb_policy: $C_LBPOLICY
+http2_protocol_options: {}
+load_assignment:
+  cluster_name: $C_NAME
+  endpoints:
+  - lb_endpoints:
+    - endpoint:
+        address:
+          socket_address:
+            address: $C_ADDR
+            port_value: $C_PORT
+transport_socket:
+  name: envoy.transport_sockets.tcp_stats.v3.Config
+  typed_config:
+    "@type": "type.googleapis.com/envoy.extensions.transport_sockets.tcp_stats.v3.Config"
+    transport_socket:
+      name: envoy.transport_sockets.raw_buffer
+      typed_config:
+        "@type": type.googleapis.com/envoy.extensions.transport_sockets.raw_buffer.v3.RawBuffer
+    update_period: 1s

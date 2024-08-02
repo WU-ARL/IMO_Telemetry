@@ -1,0 +1,21 @@
+name: $C_NAME
+type: $C_DISCOVERY # service discovery type to use for resolving cluster (default STATIC)
+lb_policy: $C_LBPOLICY # load balancer type (default ROUND_ROBIN)
+http2_protocol_options: {} 
+load_assignment:
+  cluster_name: $C_NAME # user defined cluster name (automatically assigned when using the generator)
+  endpoints:
+  - lb_endpoints:
+    - endpoint:
+        address:
+          socket_address:
+            address: $C_ADDR # address of next hop (specified when physical topology is chosen)
+            port_value: $C_PORT # port of next hop (specified when physical topology is chosen)
+transport_socket:
+  name: envoy.transport_sockets.tls
+  typed_config:
+    "@type": type.googleapis.com/envoy.extensions.transport_sockets.tls.v3.UpstreamTlsContext
+    common_tls_context:
+      tls_params:
+        tls_minimum_protocol_version: $TLS_MIN_VERSION # default TLSV1_3
+        tls_maximum_protocol_version: $TLS_MAX_VERSION # default TLSv1_3

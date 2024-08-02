@@ -1,0 +1,56 @@
+name: $L_NAME
+address:
+  socket_address:
+    protocol: $L_PROTOCOL #TCP
+    address: 0.0.0.0 #$L_ADDR
+    port_value: $L_PORT
+filter_chains:
+- filters:
+  - name: envoy.filters.network.http_connection_manager
+    typed_config:
+      "@type": type.googleapis.com/envoy.extensions.filters.network.http_connection_manager.v3.HttpConnectionManager
+      request_id_extension:
+        typed_config:
+          "@type": type.googleapis.com/envoy.extensions.request_id.uuid.v3.UuidRequestIdConfig
+      generate_request_id: true
+      tracing:
+        provider:
+          name: envoy.tracers.opentelemetry
+          typed_config:
+            "@type": type.googleapis.com/envoy.config.trace.v3.OpenTelemetryConfig
+            grpc_service:
+              envoy_grpc:
+                cluster_name: jaeger_stats
+              timeout: 1s
+            service_name: $NODE_ID
+      access_log:
+      - name: envoy.access_loggers.stdout
+        typed_config:
+          "@type": type.googleapis.com/envoy.extensions.access_loggers.stream.v3.StdoutAccessLog
+      codec_type: AUTO
+      stat_prefix: $L_NAME
+      http_protocol_options:
+        allow_chunked_length: true
+      route_config:
+        name: route1
+        virtual_hosts:
+        - name: default 
+          domains:
+          - "*"
+          routes:
+          - match:
+              prefix: "/"
+            route:
+            #return 503 after 12m                
+              timeout: 0s
+              idle_timeout: 0s
+              # $NOTE change or remove retry policy section
+              retry_policy:
+                  retry_on: 5xx,refused-stream,connect-failure,gateway-error,reset
+                  num_retries: 4
+                  per_try_timeout: 180s                
+              cluster: $L_NHCLUSTER
+      http_filters:
+      - name: envoy.filters.http.router
+        typed_config:
+          "@type": type.googleapis.com/envoy.extensions.filters.http.router.v3.Router

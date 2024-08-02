@@ -1,0 +1,59 @@
+version: '3.8'
+
+x-default-logging: &logging
+  driver: "json-file"
+  options:
+    max-size: "5m"
+    max-file: "2"
+
+services:
+
+
+  prometheus:
+    image: prom/prometheus:latest
+    volumes:
+      - ./prometheus_otel.yml:/etc/prometheus/prometheus.yml
+    ports:
+      - "9090:9090"
+    networks:
+      - app-network
+      # - server_network
+
+  #grafana: #uncomment following service if you want to run grafana through the docker compose
+  #  image: grafana/grafana:latest
+  #  ports:
+  #    - "3000:3000" # Grafana uses 3001 here to not interfere with local hosts grafana daemon
+  #  volumes:
+  #    - ../grafana_data:/var/lib/grafana #may want to create a grafana_data dir somewhere for all docker-compose
+  #                                      #topologies to share
+  #  depends_on:
+  #    - prometheus
+  #  networks:
+  #    - app-network
+
+  otelcol:
+    image: otel/opentelemetry-collector:latest
+    ports:
+      - "4319:4319" #uses 4319 instead of default 4317 to avoid interference with Jaeger all in one
+
+    command: [ "--config=/etc/otelcol/config.yaml"]
+    logging: *logging
+    volumes:
+      - ./otel-collector-config.yaml:/etc/otelcol/config.yaml
+    networks:
+      - app-network
+
+  jaeger:
+    image: jaegertracing/all-in-one:latest
+    ports:
+      - "16686:16686"
+    networks:
+      - app-network
+
+#ADD other experiment specific nodes here
+
+networks:
+  app-network:
+    driver: bridge
+        
+

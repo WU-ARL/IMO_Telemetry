@@ -1,0 +1,184 @@
+version: '3.8'
+
+x-default-logging: &logging
+  driver: "json-file"
+  options:
+    max-size: "5m"
+    max-file: "2"
+
+services:
+
+  couchdb:
+    build:
+      context: .
+      dockerfile: Dockerfile-couchdb
+    volumes:
+      - ./couchdb/:/tmp/
+    environment:
+      - "COUCHDB_USER=imo"
+      - "COUCHDB_PASSWORD=123456"
+    ports:
+      - "5984:5984"
+    networks:
+      - app-network
+      # - server_network
+
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5984/_up"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+
+  envoy-controller:
+    image: envoy_controller:20240604
+    depends_on:
+      couchdb:
+        condition: service_healthy
+    volumes:
+      - ./controller/controller.crt:/controller/controller.crt
+      - ./controller/controller.key:/controller/controller.key
+#    ports:
+#      - "18000:18000"
+#      - "19000:19000"
+    command:
+      - "-dbUserName=imo"
+      - -dbHost=couchdb
+      - "-updateTime=10s"
+      - "-dbPort=5984"
+      - "-dbPassword=123456"
+      - "-dbName=users"
+    networks:
+      - app-network
+      # - server_network
+
+
+  client:
+    image: envoyproxy/envoy:v1.29-latest
+    depends_on:
+      - envoy-controller
+      - couchdb
+    volumes:
+      - ./envoy/allnodes/controller.crt:/etc/envoy/controller.crt
+      #- ../gen_files/docker/envoy_static_client.yaml:/etc/envoy/envoy.yaml
+      - ../gen_files/docker/envoy_basedyn_client.yaml:/etc/envoy/envoy.yaml
+      - ./envoy/allnodes/cert.pem:/etc/envoy/cert.pem
+      - ./envoy/allnodes/key.pem:/etc/envoy/key.pem
+    ports:
+      - "9001:9001"
+    networks:
+      - app-network
+
+  intermediate:
+    image: envoyproxy/envoy:v1.29-latest
+    depends_on:
+      - envoy-controller
+      - couchdb
+    volumes:
+      - ./envoy/allnodes/controller.crt:/etc/envoy/controller.crt
+      #- ../gen_files/docker/envoy_static_intermediate.yaml:/etc/envoy/envoy.yaml
+      - ../gen_files/docker/envoy_basedyn_intermediate.yaml:/etc/envoy/envoy.yaml
+      - ./envoy/allnodes/cert.pem:/etc/envoy/cert.pem
+      - ./envoy/allnodes/key.pem:/etc/envoy/key.pem
+    ports:
+      - "9002:9002"
+    networks:
+      - app-network
+
+  server:
+    image: envoyproxy/envoy:v1.29-latest
+    depends_on:
+      - envoy-controller
+      - couchdb
+    volumes:
+      - ./envoy/allnodes/controller.crt:/etc/envoy/controller.crt
+      #- ../gen_files/docker/envoy_static_server.yaml:/etc/envoy/envoy.yaml
+      - ../gen_files/docker/envoy_basedyn_server.yaml:/etc/envoy/envoy.yaml
+      - ./envoy/allnodes/cert.pem:/etc/envoy/cert.pem
+      - ./envoy/allnodes/key.pem:/etc/envoy/key.pem
+    ports:
+      - "9003:9003"
+    networks:
+      - app-network
+
+  nginx:
+    image: nginx:latest
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf
+      - ../testFiles/:/usr/share/nginx/html/
+      - ./nginx/cert.pem:/etc/nginx/cert.pem
+      - ./nginx/key.pem:/etc/nginx/key.pem
+    ports:
+      - "443:443"
+      - "8880:8880"
+    networks:
+      - app-network
+      # - server_network
+
+
+  prometheus:
+    image: prom/prometheus:latest
+    volumes:
+      - ./prometheus_otel.yml:/etc/prometheus/prometheus.yml
+    ports:
+      - "9090:9090"
+    networks:
+      - app-network
+      # - server_network
+
+
+  #grafana:
+    #image: grafana/grafana:latest
+    #ports:
+    #  - "3000:3000"
+    #volumes:
+    #  - ../../grafana_data:/var/lib/grafana
+    #depends_on:
+    #  - prometheus
+    #networks:
+    #  - app-network
+      # - server_network
+
+  otelcol:
+    image: otel/opentelemetry-collector:latest
+    ports:
+      - "4319:4319"
+
+    command: [ "--config=/etc/otelcol/config.yaml"]
+    logging: *logging
+    volumes:
+      - ./otel-collector-config.yaml:/etc/otelcol/config.yaml
+    networks:
+      - app-network
+
+  jaeger:
+    image: jaegertracing/all-in-one:latest
+    ports:
+      - "16686:16686"
+    networks:
+      - app-network
+
+  ubuntu-curl:
+    build:
+      context: .
+      dockerfile: Dockerfile-curl
+    networks:
+      - app-network
+      # - client_network
+
+  ubuntu-2:
+    build:
+      context: .
+      dockerfile: Dockerfile-curl
+    networks:
+      - app-network
+      # - client_network
+
+
+networks:
+  app-network:
+    driver: bridge
+        
+volumes:
+  couchdb_data:
+

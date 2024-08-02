@@ -1,0 +1,98 @@
+node:
+  cluster: $NODE_CLUSTER
+  id: $NODE_ID
+  metadata:
+    secretKey: $NODE_SECRET
+admin: #defines the port to view admin stats for the proxy
+  address:
+    socket_address:
+      address: 0.0.0.0
+      port_value: $NODE_ADMIN_PORT 
+
+stats_flush_interval: 0.5s #flushes stats every 1/2 sec so visualizations have finer granularity
+
+stats_config: #defines the envoy tag for this proxy, metrics sent can be identified by this in the dashboard
+  stats_tags:
+  - tag_name: envoy
+    fixed_value: $NODE_ID
+
+stats_sinks: #sends metrics to the otel collector
+- name: envoy.stat_sinks.open_telemetry
+  typed_config:
+    "@type": type.googleapis.com/envoy.extensions.stat_sinks.open_telemetry.v3.SinkConfig
+    grpc_service:
+      envoy_grpc:
+        cluster_name: otlp_stats
+      timeout: 1s
+    emit_tags_as_attributes: true
+
+dynamic_resources:
+  ads_config:
+    api_type: GRPC
+    transport_api_version: V3
+    grpc_services:
+    - envoy_grpc:
+        cluster_name: xds_cluster
+  cds_config:
+    resource_api_version: V3
+    ads: {}
+    initial_fetch_timeout: 300s
+  lds_config:
+    resource_api_version: V3
+    ads: {}
+    initial_fetch_timeout: 300s
+    
+static_resources:
+  clusters:                                
+  - name: xds_cluster
+    connect_timeout: 5s
+    type: LOGICAL_DNS
+    lb_policy: ROUND_ROBIN
+    http2_protocol_options: {}
+    upstream_connection_options:
+      tcp_keepalive: {}
+    load_assignment:
+      cluster_name: xds_cluster
+      endpoints:
+      - lb_endpoints:
+        - endpoint:
+            address:
+              socket_address:
+                address: $CONTROLLER_ADDR    # address of xds controller  
+                port_value: $CONTROLLER_PORT # port of xds controller
+    transport_socket:
+      name: envoy.transport_sockets.tls
+      typed_config:
+        "@type": type.googleapis.com/envoy.extensions.transport_sockets.tls.v3.UpstreamTlsContext
+        common_tls_context:
+          tls_params:
+            tls_minimum_protocol_version: TLSv1_3
+            tls_maximum_protocol_version: TLSv1_3
+          validation_context:
+            trusted_ca: { filename: "/etc/envoy/controller.crt" }            
+    typed_extension_protocol_options:
+      envoy.extensions.upstreams.http.v3.HttpProtocolOptions:
+        "@type": type.googleapis.com/envoy.extensions.upstreams.http.v3.HttpProtocolOptions
+        explicit_http_config:
+          http2_protocol_options:
+            connection_keepalive:
+              interval: 30s
+              timeout: 5s                
+  - name: otlp_stats #cluster points to local listener in database config to allow dynamic setting of otel collector
+    connect_timeout: 5s
+    type: LOGICAL_DNS
+    typed_extension_protocol_options:
+      envoy.extensions.upstreams.http.v3.HttpProtocolOptions:
+        "@type": type.googleapis.com/envoy.extensions.upstreams.http.v3.HttpProtocolOptions
+        explicit_http_config:
+          http2_protocol_options: {}
+    load_assignment:
+      cluster_name: otlp_stats
+      endpoints:
+      - lb_endpoints:
+        - endpoint:
+            address:
+              socket_address:
+                address: 0.0.0.0
+                port_value: 4319
+

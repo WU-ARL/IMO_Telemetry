@@ -1,0 +1,10 @@
+ENV_TYPE docker
+NODE client client
+NODE intermediate intermediate
+NODE server server
+NODE nginx nginx
+
+OTEL_ADDR:otelcol
+JAEGER_ADDR:jaeger
+CONTROLLER_ADDR:envoy-controller
+
